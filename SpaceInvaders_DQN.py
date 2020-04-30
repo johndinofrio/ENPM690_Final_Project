@@ -2,6 +2,7 @@ import retro
 import numpy as np
 import random
 import tensorflow as tf
+import keras
 from keras.models import Sequential
 from keras.layers import Dense, Convolution2D, Flatten
 from keras.optimizers import Adam
@@ -130,7 +131,7 @@ def DQNetwork():
 agent = DQNetwork()
 agent.summary()
 rewards_list=[]
-Episodes=2
+Episodes = 50
 
 # Training learning measurement variables
 current_step = 0
@@ -154,7 +155,9 @@ for episode in range(Episodes):
      while step < max_steps:
          step += 1
          decay_step +=1
-         # Predict the action to take and take it
+#         Loading the latest model
+#         agent = keras.models.load("Training episode 49_.h5")         
+# Predict the action to take and take it
          action, explore_probability = predict_action(agent,explore_start, explore_stop, decay_rate, decay_step, state, possible_actions)
  #Perform the action and get the next_state, reward, and done information
          next_state, reward, done, _ = env.step(action)
@@ -193,6 +196,8 @@ for episode in range(Episodes):
      env.render() 
  # train the agent with the experience of the episode
      agent=replay(agent,batch_size,memory)
+     agent.save("Training episode "+str(episode)+'_.h5')
+     agent = keras.models.load_model("Training episode "+str(episode)+'_.h5')
 
 # Training - Total Reward vs Step Number graph
 plt.plot(step_number, accumulated_reward, linewidth=1.0)
@@ -228,7 +233,7 @@ plt.show()
 #======LIVE GAMEPLAY AFTER TRAINING========
     
 # reset state in the beginning of each game
-total_test_episodes = 10
+total_test_episodes = 5
 
 accumulated_reward = []
 current_step = 0
@@ -245,11 +250,12 @@ for episode in range(total_test_episodes):
      state = env.reset()
      state, stacked_frames = stack_frames(stacked_frames, state, True)
      done = False
+     agent_loaded = keras.models.load_model('Training episode 49_.h5')
      while not done:
          step += 1
          decay_step +=1
          # Predict the action to take and take it
-         action, explore_probability = predict_action(agent,explore_start, explore_stop, decay_rate, decay_step, state, possible_actions)
+         action, explore_probability = predict_action(agent_loaded,explore_start, explore_stop, decay_rate, decay_step, state, possible_actions)
      #Perform the action and get the next_state, reward, and done information
          next_state, reward, done, _ = env.step(action)
          # Add the reward to total reward
@@ -285,5 +291,3 @@ plt.title('Reward per Game for DQN Test')
 plt.ylabel('Score')
 plt.xlabel('Episode')
 plt.show()
-    
-    
