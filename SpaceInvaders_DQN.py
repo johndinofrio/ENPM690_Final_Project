@@ -123,7 +123,7 @@ def DQNetwork():
      model.add(Convolution2D(128, kernel_size=3, strides=2, padding='valid',activation='elu'))
      model.add(Flatten())
      model.add(Dense(units=512))
-     model.add(Dense(units=3,activation='softmax'))
+     model.add(Dense(units=8,activation='softmax'))
      model.compile(optimizer=Adam(0.01),loss='mse')
      return model
  
