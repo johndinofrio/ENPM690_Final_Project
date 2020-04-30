@@ -128,7 +128,9 @@ def DQNetwork():
      return model
  
     
-agent = DQNetwork()
+#agent = DQNetwork()
+#Loading the latest model
+agent = keras.models.load_model("Training episode 49_.h5")     
 agent.summary()
 rewards_list=[]
 Episodes = 50
@@ -151,12 +153,11 @@ for episode in range(Episodes):
      total_rewards = 0
      episode_rewards = []
      state = env.reset()
-     state, stacked_frames = stack_frames(stacked_frames, state, True)
+     state, stacked_frames = stack_frames(stacked_frames, state, True)     
+     
      while step < max_steps:
          step += 1
          decay_step +=1
-#         Loading the latest model
-#         agent = keras.models.load("Training episode 49_.h5")         
 # Predict the action to take and take it
          action, explore_probability = predict_action(agent,explore_start, explore_stop, decay_rate, decay_step, state, possible_actions)
  #Perform the action and get the next_state, reward, and done information
