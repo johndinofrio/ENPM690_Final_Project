@@ -1,7 +1,6 @@
 import retro
 import numpy as np
 import random
-import tensorflow as tf
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Convolution2D, Flatten
@@ -22,7 +21,7 @@ def preprocess_frame(frame):
      # [Up: Down, Left: right]
      cropped_frame = gray[8:-12,4:-12]
      # Normalize Pixel Values
-     normalized_frame = cropped_frame/255.0
+     normalized_frame = cropped_frame/255.0 
      # Resize
      preprocessed_frame = transform.resize(normalized_frame, [110,84])
      return preprocessed_frame 
@@ -40,7 +39,8 @@ def stack_frames(stacked_frames, state, is_new_episode):
          stacked_frames.append(frame)
          stacked_frames.append(frame)
          stacked_frames.append(frame)
-         stacked_frames.append(frame) 
+         stacked_frames.append(frame)
+         
          # Stack the frames
          stacked_state = np.stack(stacked_frames, axis=2) 
      else:
@@ -57,9 +57,9 @@ action_size = env.action_space.n # 8 possible actions
 learning_rate = 0.00025 # Alpha (aka learning rate)
 
 ### TRAINING HYPERPARAMETERS
-total_episodes = 50 # Total episodes for training
+total_episodes = 200 # Total episodes for training
 max_steps = 50000 # Max possible steps in an episode
-batch_size = 32 # Batch size
+batch_size = 64 # Batch size
 
 # Exploration parameters for epsilon greedy strategy
 explore_start = 1.0 # exploration probability at start
@@ -88,9 +88,47 @@ def sample(memory, batch_size):
      buffer_size = len(memory)
      index = np.random.choice(np.arange(buffer_size),
      size = batch_size,
-     replace = True) 
+     replace = False) 
      return [memory[i] for i in index]
  
+for i in range(pretrain_length):
+    # If it's the first step
+    if i == 0:
+        state = env.reset()
+        
+        state, stacked_frames = stack_frames(stacked_frames, state, True)
+        
+    # Get the next_state, the rewards, done by taking a random action
+    choice = random.randint(1,len(possible_actions))-1
+    action = possible_actions[choice]
+    next_state, reward, done, _ = env.step(action)
+    
+    #env.render()
+    
+    # Stack the frames
+    next_state, stacked_frames = stack_frames(stacked_frames, next_state, False)
+    
+    
+    # If the episode is finished (we're dead 3x)
+    if done:
+        # We finished the episode
+        next_state = np.zeros(state.shape)
+        
+        # Add experience to memory
+        memory.append((state, action, reward, next_state, done))
+        
+        # Start a new episode
+        state = env.reset()
+        
+        # Stack the frames
+        state, stacked_frames = stack_frames(stacked_frames, state, True)
+        
+    else:
+        # Add experience to memory
+        memory.append((state, action, reward, next_state, done))
+        
+        # Our new state is now the next_state
+        state = next_state
     
 def predict_action(model,explore_start, explore_stop, decay_rate, decay_step, state, actions):
      exp_exp_tradeoff = np.random.rand()
@@ -109,18 +147,18 @@ def replay(agent,batch_size,memory):
      minibatch = sample(memory,batch_size)
      for state, action, reward, next_state, done in minibatch:
          target = reward
-     if not done:        
-          target = reward + gamma*np.max(agent.predict(next_state.reshape((1,*next_state.shape)))[0])
-          target_f = agent.predict(state.reshape((1,*state.shape)))
-          target_f[0][action] = target
-          agent.fit(state.reshape((1,*state.shape)), target_f, epochs=1, verbose=0)
+     if not done:
+         target = reward + gamma*np.max(agent.predict(next_state.reshape((1,*next_state.shape)))[0])
+         target_f = agent.predict(state.reshape((1,*state.shape)))
+         target_f[0][action] = target
+         agent.fit(state.reshape((1,*state.shape)), target_f, epochs=1, verbose=0)
      return agent    
     
 def DQNetwork():
      model=Sequential()
-     model.add(Convolution2D(32,input_shape=(110,84,4),kernel_size=8, strides=4, padding='valid',activation='elu'))
-     model.add(Convolution2D(64, kernel_size=4, strides=2, padding='valid',activation='elu'))
-     model.add(Convolution2D(128, kernel_size=3, strides=2, padding='valid',activation='elu'))
+     model.add(Convolution2D(16,input_shape=(110,84,4),kernel_size=8, strides=4, padding='valid',activation='elu'))
+     model.add(Convolution2D(32, kernel_size=4, strides=2, padding='valid',activation='elu'))
+     model.add(Convolution2D(64, kernel_size=3, strides=2, padding='valid',activation='elu'))
      model.add(Flatten())
      model.add(Dense(units=512))
      model.add(Dense(units=8,activation='softmax'))
@@ -128,12 +166,12 @@ def DQNetwork():
      return model
  
     
-#agent = DQNetwork()
+agent = DQNetwork()
 #Loading the latest model
-agent = keras.models.load_model("Training episode 49_.h5")     
+#agent = keras.models.load_model("Training episode 299_.h5")     
 agent.summary()
 rewards_list=[]
-Episodes = 50
+Episodes = 200
 
 # Training learning measurement variables
 current_step = 0
@@ -251,12 +289,12 @@ for episode in range(total_test_episodes):
      state = env.reset()
      state, stacked_frames = stack_frames(stacked_frames, state, True)
      done = False
-     agent_loaded = keras.models.load_model('Training episode 49_.h5')
+     #agent_loaded = keras.models.load_model('Training episode 184_.h5')
      while not done:
          step += 1
          decay_step +=1
          # Predict the action to take and take it
-         action, explore_probability = predict_action(agent_loaded,explore_start, explore_stop, decay_rate, decay_step, state, possible_actions)
+         action, explore_probability = predict_action(agent,explore_start, explore_stop, decay_rate, decay_step, state, possible_actions)
      #Perform the action and get the next_state, reward, and done information
          next_state, reward, done, _ = env.step(action)
          # Add the reward to total reward
