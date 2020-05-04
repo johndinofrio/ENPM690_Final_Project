@@ -18,8 +18,8 @@ print("State size ", state_size)
 qtable = np.zeros((state_size, action_size))
 
 
-total_episodes = 200            # Total episodes
-max_steps = 10000               # Max steps per episode
+total_episodes = 500            # Total episodes
+max_steps = 50000               # Max steps per episode
 
 learning_rate = 0.3             # Learning rate
 gamma = 0.7                     # Discounting rate
@@ -105,7 +105,7 @@ for episode in range(total_episodes):
     epsilon = min_epsilon + (max_epsilon - min_epsilon)*np.exp(-decay_rate*episode)
 
 # Save the Q-table with the training info
-#np.save('Qtable', qtable)
+np.save('Qtable', qtable)
 
 # Training - Total Reward vs Step Number graph
 plt.plot(step_number, accumulated_reward, linewidth=1.0)
