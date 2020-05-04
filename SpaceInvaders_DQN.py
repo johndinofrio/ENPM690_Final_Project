@@ -147,11 +147,11 @@ def replay(agent,batch_size,memory):
      minibatch = sample(memory,batch_size)
      for state, action, reward, next_state, done in minibatch:
          target = reward
-     if not done:
-         target = reward + gamma*np.max(agent.predict(next_state.reshape((1,*next_state.shape)))[0])
-         target_f = agent.predict(state.reshape((1,*state.shape)))
-         target_f[0][action] = target
-         agent.fit(state.reshape((1,*state.shape)), target_f, epochs=1, verbose=0)
+         if not done:
+             target = reward + gamma*np.max(agent.predict(next_state.reshape((1,*next_state.shape)))[0])
+             target_f = agent.predict(state.reshape((1,*state.shape)))
+             target_f[0][action] = target
+             agent.fit(state.reshape((1,*state.shape)), target_f, epochs=1, verbose=0)
      return agent    
     
 def DQNetwork():
@@ -171,7 +171,7 @@ agent = DQNetwork()
 #agent = keras.models.load_model("Training episode 299_.h5")     
 agent.summary()
 rewards_list=[]
-Episodes = 200
+Episodes = 10
 
 # Training learning measurement variables
 current_step = 0
