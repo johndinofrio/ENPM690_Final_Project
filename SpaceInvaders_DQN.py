@@ -235,8 +235,8 @@ for episode in range(Episodes):
      env.render() 
  # train the agent with the experience of the episode
      agent=replay(agent,batch_size,memory)
-     agent.save("Training episode "+str(episode)+'_.h5')
-     agent = keras.models.load_model("Training episode "+str(episode)+'_.h5')
+     #agent.save("Training episode "+str(episode)+'_.h5')
+     #agent = keras.models.load_model("Training episode "+str(episode)+'_.h5')
 
 # Training - Total Reward vs Step Number graph
 plt.plot(step_number, accumulated_reward, linewidth=1.0)
