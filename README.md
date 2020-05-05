@@ -12,6 +12,7 @@ The following dependencies must be installed. There are a lot of them, and it mi
 6. skimage
 7. gym
 8. retro
+9. keras
 
 To import the dependencies above, use:
 
