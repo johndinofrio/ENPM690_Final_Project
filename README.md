@@ -13,6 +13,12 @@ The following dependencies must be installed. There are a lot of them, and it mi
 7. gym
 8. retro
 
+To import the dependencies above, use:
+
+```
+pip install (dependency name)
+```
+
 ## Q-Learrning Training and Testing
 
 <p align="center">
