@@ -17,7 +17,7 @@ The following dependencies must be installed. There are a lot of them, and it mi
 
 <p align="center">
   <img src="https://github.com/johndinofrio/ENPM690_Final_Project/blob/master/Report/Training%20Reward%20vs%20Steps%20500.png">
-  <br><b>Fig 1: Q-Learning Reward vs Number of Steps</b><br>
+  <br><b>Fig 1: Q-Learning Reward vs Number of Steps (500 Episodes) </b><br>
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@ The following dependencies must be installed. There are a lot of them, and it mi
 
 <p align="center">
   <img src="https://github.com/johndinofrio/ENPM690_Final_Project/blob/master/Report/DQN.png">
-  <br><b>Fig 3: DQN Reward vs Number of Steps</b><br>
+  <br><b>Fig 3: DQN Reward vs Number of Steps (200 Episodes)</b><br>
 </p>
 
 <p align="center">
