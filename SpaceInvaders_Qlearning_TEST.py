@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 import random
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 
 env = gym.make("SpaceInvaders-v0")
 env.render()
@@ -9,7 +9,7 @@ env.render()
 total_test_episodes = 10     # Total test episodes
 max_steps = 10000                # Max steps per episode
 
-qtable = np.load('Qtable.npy')
+qtable = np.load('Qtable-200.npy')
 
 env.reset()
 rewards = []
@@ -18,7 +18,7 @@ current_step = 0
 step_number = []
 accumulated_reward = []
 episodes = []
- 
+
 for episode in range(total_test_episodes):
     state = env.reset()
     all_rewards = 0
@@ -31,13 +31,15 @@ for episode in range(total_test_episodes):
 
     for step in range(max_steps):
         # Uncomment to see it play
-        #env.render()
+        env.render()
         # Take the action (index) that have the maximum expected future reward given that state
         action = np.argmax(qtable[state,:])
-        
+
+        # Retrieve the new state, reward, and game status from the action
         new_state_array, reward, done, info = env.step(action)
         
         new_state = 0
+        # Find the new state that the spaceship is at
         for i in range(159):
             if new_state_array[185][i][0] == 50:
                 new_state = i
@@ -50,7 +52,8 @@ for episode in range(total_test_episodes):
         current_step += .001    
 
         total_rewards += reward
-        
+
+        #Check if the game is finished
         if done:
             rewards.append(total_rewards)
             episodes.append(episode)
